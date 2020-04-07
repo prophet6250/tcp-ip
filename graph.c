@@ -1,0 +1,160 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "graph.h"
+
+/* private utility functions */
+static inline int
+ret_empty_intf_slot(Node *node)
+{
+	int index = 0;
+
+	while (index < MAX_INTF_PER_NODE) {
+		if ((node->intf[index]) == 0) {
+			return index;
+		}
+		index += 1;
+	}
+
+	return -1;
+}
+
+static inline Node *
+get_other_node(Interface *intf)
+{
+	Link *link = intf->link;
+
+	if (&link->intf1 == intf) {
+		return link->intf1.src_node;
+	}
+	else {
+		return link->intf1.src_node;
+	}
+}
+
+/* public API for graph creation */
+Graph *
+create_graph(char *topo_name)
+{
+	Graph *gr = calloc(1, sizeof *gr);
+	int size = GRAPH_NAME_SIZE - 1;
+
+	/* to prevent buffer overflow */
+	strncpy(gr->topology_name, topo_name, size);
+	gr->topology_name[size] = '\0';
+	
+	init_glthread(&gr->list);
+
+	return gr;
+}
+
+Node *
+create_node(Graph *graph, char *name)
+{
+	Node *node = calloc(1, sizeof *node);
+	int index = 0, size = NODE_NAME_SIZE - 1;
+
+	strncpy(node->node_name, name, size);
+	node->node_name[size] = '\0';
+
+	/* initialise the interfaces of this node */
+	while (index < MAX_INTF_PER_NODE) {
+		node->intf[index] = 0;
+		index += 1;
+	}
+
+	init_glthread(&node->glue);
+	add_next_to(&graph->list, &node->glue);
+
+	return node;
+}
+
+void
+insert_link(Node *n1, Node *n2, char *if_from,
+		char *if_to, unsigned int weight)
+{
+	Link *link = calloc(1, sizeof *link);
+	int size = INTF_NAME_SIZE - 1, empty_intf_slot;
+
+	/* 1. interface naming
+	 * 2. interface configuration
+	 * 3. interface insertion in node
+	 * will happen for both nodes n1 and n2
+	 */
+
+	/* interface 1 */
+	strncpy(link->intf1.intf_name, if_from, size);
+	link->intf1.intf_name[size] = '\0';
+
+	link->intf1.link = link;
+	link->intf1.src_node = n1;
+
+	empty_intf_slot = ret_empty_intf_slot(n1);
+	n1->intf[empty_intf_slot] = &link->intf2;
+
+	/* interface 2 */
+	strncpy(link->intf2.intf_name, if_to, size);
+	link->intf2.intf_name[size] = '\0';
+
+	link->intf2.link = link;
+	link->intf2.src_node = n2;
+
+	empty_intf_slot = ret_empty_intf_slot(n2);
+	n2->intf[empty_intf_slot] = &link->intf1;
+
+	link->cost = weight;
+
+	return;
+}
+
+void
+dump_graph(Graph *graph)
+{
+	glthread *iter = NULL;
+	Node *curr_node;
+
+	printf("Topology Name: %s\n", graph->topology_name);
+
+	ITERATE_GL_BEGIN(&graph->list, iter) {
+		curr_node = glue_to_node(iter);
+		dump_node(curr_node);
+	} ITERATE_GL_END(&graph->list, iter);
+
+	return;
+}
+
+void
+dump_node(Node *node)
+{
+	unsigned int index = 0;
+	Interface *intf;
+
+	printf("\nNode name: %s\n", node->node_name);
+
+	while (index < MAX_INTF_PER_NODE) {
+		intf = node->intf[index];
+
+		if (intf == 0) break;
+
+		dump_interface(intf);
+		index += 1;
+	}
+
+	return;
+}
+
+void
+dump_interface(Interface *intf)
+{
+	Link *link = intf->link;
+	Node *other_node = get_other_node(intf);
+
+	printf("Current Node: %s, Interface Name: %s, Other End: %s, "
+			"Cost: %u\n", intf->src_node->node_name,
+			intf->intf_name, other_node->node_name,
+			link->cost);
+
+	return;
+}
+

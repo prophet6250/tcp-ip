@@ -6,7 +6,7 @@
 	((ptr)->right == NULL && (ptr)->left == NULL)
 
 #define GLTHREAD_TO_STRUCT(func_name, struct_name, field)	\
-static inline struct_name * func_name(glthread_t *glptr) {	\
+static inline struct_name * func_name(glthread *glptr) {	\
 	return ((struct_name *)((char *)(glptr) - 		\
 		(char *)&(((struct_name *)0)->field)));		\
 }
@@ -14,7 +14,7 @@ static inline struct_name * func_name(glthread_t *glptr) {	\
 #define BASE(glptr) ((glptr)->right)
 
 #define ITERATE_GL_BEGIN(glstart, glptr) {			\
-	glthread_t *glthread_ptr = 0;				\
+	glthread *glthread_ptr = 0;				\
 	if (BASE(glstart)) { 					\
 		glthread_ptr = BASE(glstart);			\
 	}							\
@@ -29,7 +29,7 @@ static inline struct_name * func_name(glthread_t *glptr) {	\
 
 #if 0
 void *
-gl_search(glthread_t *base, void *(*thread_to_struct_func)(glthread_t *),
+gl_search(glthread *base, void *(*thread_to_struct_func)(glthread *),
 		void *key, int (*comp_fn)(void *, void *));
 #endif
 
@@ -37,32 +37,32 @@ gl_search(glthread_t *base, void *(*thread_to_struct_func)(glthread_t *),
 typedef struct glthread_ {
 	struct glthread_ *left;
 	struct glthread_ *right;
-} glthread_t;
+} glthread;
 
 /* public APIs to do glthread operations */
 void
-add_next_to (glthread_t *curr, glthread_t *New);
+add_next_to (glthread *curr, glthread *New);
 
 void
-add_before (glthread_t *curr, glthread_t *New);
+add_before (glthread *curr, glthread *New);
 
 void
-remove_glthread (glthread_t *glthread);
+remove_glthread (glthread *glthread);
 
 void
-init_glthread (glthread_t *glthread);
+init_glthread (glthread *glthread);
 
 void
-add_to_last (glthread_t *head, glthread_t *New);
+add_to_last (glthread *head, glthread *New);
 
 void
-delete_gl_list (glthread_t *base);
+delete_gl_list (glthread *base);
 
 unsigned int
-get_gl_list_count (glthread_t *base);
+get_gl_list_count (glthread *base);
 
 void
-glthread_priority_insert (glthread_t *head, glthread_t *New,
+glthread_priority_insert (glthread *head, glthread *New,
 		int (*comp_fn)(void *, void *), int offset);
 
 /* endif __GLUETHREAD__ */

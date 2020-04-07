@@ -3,9 +3,9 @@
 
 /* add New next to the curr gl pointer */
 void
-add_next_to (glthread_t *curr, glthread_t *New)
+add_next_to (glthread *curr, glthread *New)
 {
-	glthread_t *curr_right = curr->right;
+	glthread *curr_right = curr->right;
 
 	if (curr_right == NULL) {
 		curr->right = New;
@@ -23,9 +23,9 @@ add_next_to (glthread_t *curr, glthread_t *New)
 
 /* add New before the curr gl pointer */
 void
-add_before (glthread_t *curr, glthread_t *New)
+add_before (glthread *curr, glthread *New)
 {
-	glthread_t *curr_left = curr->left;
+	glthread *curr_left = curr->left;
 
 	curr->left = New;
 	New->right = curr;
@@ -42,11 +42,11 @@ add_before (glthread_t *curr, glthread_t *New)
 
 /* remove the curr glthread, irrespective of its position in the list */
 void
-remove_glthread (glthread_t *curr)
+remove_glthread (glthread *curr)
 {
 	if (curr == NULL) return;
 
-	glthread_t *curr_left, *curr_right;
+	glthread *curr_left, *curr_right;
 	curr_left = curr->left;
 	curr_right = curr->right;
 	curr = NULL;
@@ -72,7 +72,7 @@ remove_glthread (glthread_t *curr)
 }
 
 void
-init_glthread(glthread_t *glptr)
+init_glthread(glthread *glptr)
 {
 	glptr->left = NULL, glptr->right = NULL;
 	return;
@@ -80,9 +80,9 @@ init_glthread(glthread_t *glptr)
 
 /* add New node to the last of the glthread list */
 void 
-add_to_last (glthread_t *head, glthread_t *New)
+add_to_last (glthread *head, glthread *New)
 {
-	glthread_t *temp = NULL, *last = NULL;
+	glthread *temp = NULL, *last = NULL;
 
 	/* last will be the pointer to the last node, temp will go beyond the
 	 * last node */
@@ -99,9 +99,9 @@ add_to_last (glthread_t *head, glthread_t *New)
 
 /* delete the entire GL DLL */
 void
-delete_gl_list (glthread_t *base)
+delete_gl_list (glthread *base)
 {
-	glthread_t *temp = NULL;
+	glthread *temp = NULL;
 	ITERATE_GL_BEGIN(base, temp) {
 		remove_glthread (temp);
 	} ITERATE_GL_END(base, temp);
@@ -110,10 +110,10 @@ delete_gl_list (glthread_t *base)
 
 /* return the count of all the nodes in the list */
 unsigned int
-get_gl_list_count (glthread_t *base)
+get_gl_list_count (glthread *base)
 {
 	unsigned int count = 0;
-	glthread_t *temp = NULL;
+	glthread *temp = NULL;
 
 	ITERATE_GL_BEGIN(base, temp) {
 		count += 1;
@@ -124,12 +124,12 @@ get_gl_list_count (glthread_t *base)
 }
 
 void
-glthread_priority_insert (glthread_t *head, glthread_t *New,
+glthread_priority_insert (glthread *head, glthread *New,
 		int (*comp_fn)(void *, void *), int offset)
 {
 	init_glthread(New);
 
-	glthread_t *head_right = NULL, 
+	glthread *head_right = NULL, 
 		   *last = NULL, 
 		   *temp = NULL;
 

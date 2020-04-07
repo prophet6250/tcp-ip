@@ -8,7 +8,7 @@
 
 typedef struct emp_ {
 	int id;
-	glthread_t glue;
+	glthread glue;
 } emp_t;
 
 GLTHREAD_TO_STRUCT(thread_to_struct, emp_t, glue);
@@ -24,8 +24,8 @@ ID(emp_t *e1, emp_t *e2)
 int main() 
 {
 	emp_t e[5];
-	glthread_t base;
-	glthread_t *curr = NULL;
+	glthread base;
+	glthread *curr = NULL;
 	init_glthread(&base);
 
 	
