@@ -4,7 +4,6 @@
 
 #include "graph.h"
 
-/* utility functions */
 int
 ret_empty_intf_slot(Node *node)
 {
@@ -27,7 +26,7 @@ get_other_node(Interface *intf)
 	Link *link = intf->link;
 
 	if (&link->intf1 == intf) {
-		return link->intf1.src_node;
+		return link->intf2.src_node;
 	}
 	else {
 		return link->intf1.src_node;
@@ -43,12 +42,10 @@ get_intf_from_intf_name(Node *node, char *intf)
 	while (index < MAX_INTF_PER_NODE) {
 		curr_intf = node->intf[index];
 
-		if (curr_intf == 0) 
-			return NULL;
+		if (curr_intf == 0) return NULL;
 
-		if (strcmp(curr_intf->intf_name, intf) == 0) 
-			return curr_intf;
-
+		if (strcmp(curr_intf->intf_name, intf) == 0) return curr_intf;
+		
 		index += 1;
 	}
 	return NULL;
@@ -61,17 +58,17 @@ get_node_from_node_name(Graph *graph, char *node)
 	*base = &graph->list;
 	Node *curr_node;
 
-	ITERATE_GL_BEGIN(base, curr) {
+	ITERATE_GL_BEGIN(base, curr) 
+	{
 		curr_node = glue_to_node(curr);
-		if (strcmp(curr_node->node_name, node) == 0) {
+		if (strcmp(curr_node->node_name, node) == 0) 
 			return curr_node;
-		}
-	} ITERATE_GL_END(base, curr);
+	}
+	ITERATE_GL_END(base, curr);
 
 	return NULL;
 }
 
-/* public API for graph creation */
 Graph *
 create_graph(char *topo_name)
 {
@@ -96,7 +93,7 @@ create_node(Graph *graph, char *name)
 	strncpy(node->node_name, name, size);
 	node->node_name[size] = '\0';
 
-	/* initialise the interfaces of this node */
+	/* initialise all the interface of the node with NULL */
 	while (index < MAX_INTF_PER_NODE) {
 		node->intf[index] = 0;
 		index += 1;
@@ -105,6 +102,7 @@ create_node(Graph *graph, char *name)
 	init_glthread(&node->glue);
 	init_node_net_prop(&node->node_net_prop);
 	add_next_to(&graph->list, &node->glue);
+
 	return node;
 }
 
@@ -120,24 +118,24 @@ insert_link(Node *n1, Node *n2, char *if_from,
 	strncpy(link->intf2.intf_name, if_to, size + 1);
 	link->intf2.intf_name[size] = '\0';
 
+	
 	link->intf1.link = link;
 	link->intf1.src_node = n1;
 	link->intf2.link = link;
 	link->intf2.src_node = n2;
 
-	if ((empty_intf_slot = ret_empty_intf_slot(n1)) == -1) return;
-	n1->intf[empty_intf_slot] = &link->intf2;
+	empty_intf_slot = ret_empty_intf_slot(n1);
+	n1->intf[empty_intf_slot] = &link->intf1;
 
-
-	if ((empty_intf_slot = ret_empty_intf_slot(n2)) == -1) return;
-	n2->intf[empty_intf_slot] = &link->intf1;
+	empty_intf_slot = ret_empty_intf_slot(n2);
+	n2->intf[empty_intf_slot] = &link->intf2;
 
 	init_intf_net_prop(&link->intf1.intf_net_prop);
 	init_intf_net_prop(&link->intf2.intf_net_prop);
 	
 	assign_mac_to_intf(&link->intf1);
 	assign_mac_to_intf(&link->intf2);
-	
+
 	link->cost = weight;
 
 	return;
@@ -184,10 +182,12 @@ dump_graph(Graph *graph)
 
 	printf("Topology Name: %s\n", graph->topology_name);
 
-	ITERATE_GL_BEGIN(&graph->list, iter) {
+	ITERATE_GL_BEGIN(&graph->list, iter)
+	{
 		curr_node = glue_to_node(iter);
 		dump_node(curr_node);
-	} ITERATE_GL_END(&graph->list, iter);
+	}
+	ITERATE_GL_END(&graph->list, iter);
 
 	return;
 }

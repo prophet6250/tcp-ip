@@ -33,7 +33,7 @@ set_node_loopb_addr(Node *node, char *ip)
 
 	if (curr_prop->is_loopb_config) {
 		printf("current loopback is already configured\n");
-		printf("curr loopback address is: %s", NODE_LPB(node));
+		printf("curr loopback address is: %s\n", NODE_LPB(node));
 
 		return 1;
 	}
@@ -69,7 +69,6 @@ unset_node_intf_ip_addr(Node *node, char *local_intf)
 {
 	Interface *curr_intf = get_intf_from_intf_name(node, local_intf);
 
-	/* required node not found */
 	if (curr_intf == NULL) return 1;
 	
 	curr_intf->intf_net_prop.mask = '\0';
@@ -166,11 +165,12 @@ dump_net_node(Node *node)
 
 		if (intf == 0) break;
 
+		printf("%d) ", index);
 		dump_net_intf(intf);
+		printf("\n");
+
 		index += 1;
 	}
-
-	printf("\n");
 
 	return;
 }

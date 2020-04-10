@@ -35,7 +35,7 @@ build_topo_example()
 	set_node_loopb_addr(R0, "122.1.1.0");
 	set_node_loopb_addr(R1, "122.1.1.1");
 	set_node_loopb_addr(R2, "122.1.1.2");
-	
+
 	set_node_intf_ip_addr(R0, "eth0/0", "40.1.1.1", 24);
 	set_node_intf_ip_addr(R1, "eth0/1", "20.1.1.1", 24);
 
