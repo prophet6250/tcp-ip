@@ -78,49 +78,18 @@ unset_node_intf_ip_addr(Node *node, char *local_intf)
 	return 0;
 }
 
-
-static unsigned int
-get_hash_code(void *str, unsigned int size)
-{
-	unsigned int hash = 0, index = 0;
-
-	char *data = (char *)str;
-
-	while (index < size) {
-		hash += *data;
-		hash *= 98;
-
-		data += 1;
-		index += 1;
-	}
-	return hash;
-}
-
-static unsigned int
-get_hash_code2(void *str, unsigned int size)
-{
-	char *string = (char *)str;
-	unsigned int hash = 0, index = 0;
-
-	while (index < size) {
-
-		index += 1;
-	}
-}
-
 void
 assign_mac_to_intf(Interface *intf)
 {
 	if (intf == NULL) return;
+	int index = 0;
+	srand(time(0));
+	sleep(1);
 
-	unsigned int hash;
-	Node *node = get_other_node(intf);
-
-	hash = get_hash_code(node->node_name, NODE_NAME_SIZE);
-	hash *= get_hash_code2(intf->intf_name, INTF_NAME_SIZE);
-
-	memcpy(INTF_MAC(intf), (char *)&hash, 8);
-
+	while (index < 8) {
+		INTF_MAC(intf)[index] = rand() % 255;
+		index += 1;
+	}
 	return;
 }
 
@@ -135,7 +104,7 @@ dump_net_intf(Interface *intf)
 			"Cost: %u\n", intf->intf_name, other_node->node_name,
 			intf->link->cost);
 
-	printf("MAC: %u:%u:%u:%u:%u:%u:%u:%u\n", INTF_MAC(intf)[0],
+	printf("MAC: %x:%x:%x:%x:%x:%x\n", INTF_MAC(intf)[0],
 		INTF_MAC(intf)[1],INTF_MAC(intf)[2],INTF_MAC(intf)[3],
 		INTF_MAC(intf)[4],INTF_MAC(intf)[5]);
 
@@ -165,7 +134,7 @@ dump_net_node(Node *node)
 
 		if (intf == 0) break;
 
-		printf("%d) ", index);
+		printf("%d) ", index + 1);
 		dump_net_intf(intf);
 		printf("\n");
 

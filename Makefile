@@ -1,11 +1,11 @@
 C = gcc
 CFLAGS = -g
-TARGET : main.out
+TARGET : main.exe
 
 OBJS = gluethread/glthread.o graph.o topologies.o net.o
 
-main.out : main.o ${OBJS}
-	${CC} ${CFLAGS} main.o ${OBJS} -o main.out 
+main.exe : main.o ${OBJS}
+	${CC} ${CFLAGS} main.o ${OBJS} -o main.exe 
 
 main.o : main.c
 	${CC} ${CFLAGS} -c main.c -o main.o
@@ -26,5 +26,5 @@ net.o: net.c
 clean:
 	rm *.o
 	rm gluethread/glthread.o
-	rm *.out
+	rm *.exe
 				

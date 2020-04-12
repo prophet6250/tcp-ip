@@ -14,11 +14,11 @@ typedef struct node_ Node;
 typedef struct interface_ Interface;
 
 typedef struct ip_addr {
-	char ip_addr[16];
+	unsigned char ip_addr[16];
 } IpAddr;
 
 typedef struct mac_addr {
-	char mac_addr[8];
+	unsigned char mac_addr[8];
 } MacAddr;
 
 typedef struct node_net_prop {
