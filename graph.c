@@ -42,9 +42,12 @@ get_intf_from_intf_name(Node *node, char *intf)
 	while (index < MAX_INTF_PER_NODE) {
 		curr_intf = node->intf[index];
 
-		if (curr_intf == 0) return NULL;
-
-		if (strcmp(curr_intf->intf_name, intf) == 0) return curr_intf;
+		if (curr_intf == 0) {
+			return NULL;			
+		} 
+		if (strcmp(curr_intf->intf_name, intf) == 0) {
+			return curr_intf;
+		}
 		
 		index += 1;
 	}
@@ -118,7 +121,6 @@ insert_link(Node *n1, Node *n2, char *if_from,
 	strncpy(link->intf2.intf_name, if_to, size + 1);
 	link->intf2.intf_name[size] = '\0';
 
-	
 	link->intf1.link = link;
 	link->intf1.src_node = n1;
 	link->intf2.link = link;
@@ -165,7 +167,8 @@ dump_node(Node *node)
 	while (index < MAX_INTF_PER_NODE) {
 		intf = node->intf[index];
 
-		if (intf == 0) break;
+		if (intf == 0) 
+			break;
 
 		dump_interface(intf);
 		index += 1;

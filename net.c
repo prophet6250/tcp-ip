@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "net.h"
 #include "graph.h"
+#include "net.h"
+#include "utils.h"
 
 void
 init_intf_net_prop(IntfNetProp *intf_net_prop)
@@ -69,7 +70,9 @@ unset_node_intf_ip_addr(Node *node, char *local_intf)
 {
 	Interface *curr_intf = get_intf_from_intf_name(node, local_intf);
 
-	if (curr_intf == NULL) return 1;
+	if (curr_intf == NULL) {
+		return 1;
+	}
 	
 	curr_intf->intf_net_prop.mask = '\0';
 	curr_intf->intf_net_prop.is_IP_config = 0;
@@ -81,7 +84,10 @@ unset_node_intf_ip_addr(Node *node, char *local_intf)
 void
 assign_mac_to_intf(Interface *intf)
 {
-	if (intf == NULL) return;
+	if (intf == NULL) {
+		return;		
+	}
+
 	int index = 0;
 	srand(time(0));
 	sleep(1);
@@ -121,7 +127,7 @@ void
 dump_net_node(Node *node)
 {
 	unsigned int index = 0;
-	Interface *intf;
+	Interface *intf = NULL;
 
 	printf("\nSource Node: %s", node->node_name);
 	if (node->node_net_prop.is_loopb_config) {
@@ -149,7 +155,7 @@ dump_net_graph(Graph *graph)
 {
 	glthread *curr = NULL,
 		 *base = &graph->list;
-	Node *curr_node;
+	Node *curr_node = NULL;
 	
 	printf("Graph Topology Name: %s\n", graph->topology_name);
 
@@ -161,3 +167,28 @@ dump_net_graph(Graph *graph)
 	return;
 }
 
+Interface *
+get_matching_subnet_intf(Node *node, char *IP)
+{
+	int index = 0;
+	Interface *curr_intf = 0;
+	char intf_address[16], intf_subnet[16], IP_subnet[16];
+	char mask;
+	for (; index < MAX_INTF_PER_NODE; index++) {
+		curr_intf = node->intf[index];
+
+		if (curr_intf == 0) return 0;
+		if (IS_INTF_L3(curr_intf) == 0) continue;
+
+		strncpy(intf_address, INTF_IP(curr_intf), 16);
+		mask = curr_intf->intf_net_prop.mask;
+
+		applymask(intf_address, mask, intf_subnet);
+		applymask(IP, mask, IP_subnet);
+
+		if (strncmp(intf_subnet, IP_subnet, 16) == 0) {
+			return curr_intf;			
+		}
+	}
+	return 0;
+}
